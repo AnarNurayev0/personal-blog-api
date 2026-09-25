@@ -27,7 +27,6 @@ def get_article_by_id(id: int, db: Session = Depends(get_session)):
     article = db.query(models.Articles).filter(models.Articles.id == id).first()
 
     if not article:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"article with {id} is not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"article with id:{id} is not found")
 
     return article
-

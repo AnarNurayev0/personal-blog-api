@@ -22,7 +22,7 @@ def check_pass(stored_hash: str, plain: str) -> bool:
         return False
 
 
-def get_current_user(creds: HTTPBasicCredentials = Depends(security),session: Session = Depends(get_session),) -> Users:
+def get_current_user(creds: HTTPBasicCredentials = Depends(security), session: Session = Depends(get_session)) -> Users:
     
     user = session.exec(select(Users).where(Users.username == creds.username)).first()
 
@@ -31,7 +31,7 @@ def get_current_user(creds: HTTPBasicCredentials = Depends(security),session: Se
 
     if not user or not ok:
         
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Invalid credentials!", 
                             headers={"WWW-Authenticate": "Basic"})
     
