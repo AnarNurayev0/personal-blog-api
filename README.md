@@ -129,6 +129,11 @@ Deployed on [Render](https://render.com), against a managed PostgreSQL
 instance (Supabase). Migrations are run with `alembic upgrade head` before
 the API is exposed.
 
+> **Note:** the API runs on Render's free tier, which spins down after a
+> period of inactivity. The first request after idling can take 30–50
+> seconds to respond while the service wakes up — this is expected, not
+> a sign the API is broken. Subsequent requests are fast.
+
 ## License
 
 MIT
