@@ -1,4 +1,4 @@
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, status
 from .routers import public, admin
 
@@ -19,11 +19,14 @@ app.include_router(admin.router)
 #     allow_headers=["*"],
 # )
 
-
-# ---ROOT URL---
-
+# --- ROOT URL ---
 @app.get("/",status_code=status.HTTP_200_OK)
 async def root():
 
     return {"message": "this is the root 'personal-blog-api' "}
 
+
+# --- CHECK HEALTH ---
+@app.get("/health")
+def health():
+    return {"status": "ok"}
