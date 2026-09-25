@@ -34,3 +34,7 @@ class Users(SQLModel):
     username: str
     role: str
     created_at: datetime
+
+class AdminCreate(SQLModel):
+    username: str
+    password: str

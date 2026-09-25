@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app import schemas, models
 from typing import List
 
-router = APIRouter(prefix="/articles",tags=["public"])
+router = APIRouter(prefix="/articles",tags=["Public Articles"])
 
 
 # === PUBLIC URLS ===
