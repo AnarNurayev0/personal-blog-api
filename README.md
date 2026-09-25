@@ -1,5 +1,9 @@
 # Personal Blog API
 
+Based on the [Personal Blog](https://roadmap.sh/projects/personal-blog) project
+from roadmap.sh, implemented as a backend-only REST API with role-based admin
+auth and PostgreSQL storage instead of the filesystem.
+
 Backend-only personal blog built with **FastAPI**, **SQLModel** and **PostgreSQL**.
 Guests can read published articles; users with the `admin` role can manage articles
 and admin accounts. This is a backend-only REST API — there is no frontend. Explore
