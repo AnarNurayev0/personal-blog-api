@@ -13,7 +13,7 @@ router = APIRouter(prefix="/articles",tags=["public"])
 @router.get("",status_code=status.HTTP_200_OK,response_model=List[schemas.ArticleBase])
 def get_all_articles(db: Session = Depends(get_session)):
 
-    articles = db.query(models.Articles).all()
+    articles = db.query(models.Articles).filter(models.Articles.published == True).all()
 
     if not articles:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"articles are not found!")
@@ -24,7 +24,7 @@ def get_all_articles(db: Session = Depends(get_session)):
 @router.get("/{id}",status_code=status.HTTP_200_OK,response_model=schemas.ArticleOut)
 def get_article_by_id(id: int, db: Session = Depends(get_session)):
 
-    article = db.query(models.Articles).filter(models.Articles.id == id).first()
+    article = db.query(models.Articles).filter(models.Articles.id == id, models.Articles.published == True).first()
 
     if not article:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"article with id:{id} is not found")

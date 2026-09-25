@@ -6,7 +6,6 @@ class ArticleBase(SQLModel):
     title: str
     published: bool
 
-
 class ArticleOut(ArticleBase):
     content: str
     created_at: datetime
@@ -20,7 +19,17 @@ class ArticleInput(SQLModel):
     content: str
     published: bool = True
 
-class AdminMe(SQLModel):
+class ArticleInputPut(SQLModel):
+    title: str
+    content: str
+    published: bool = True
+
+class ArticleInputPatch(SQLModel):
+    title: str | None = None
+    content: str | None = None
+    published: bool | None = None
+
+class Users(SQLModel):
     id: int
     username: str
     role: str
