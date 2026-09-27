@@ -1,7 +1,8 @@
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException, Request
 from app.database import get_session
 from sqlalchemy.orm import Session
 from app import schemas, models
+from ..limiter import limiter
 from typing import List
 
 router = APIRouter(prefix="/articles",tags=["Public Articles"])
@@ -11,18 +12,17 @@ router = APIRouter(prefix="/articles",tags=["Public Articles"])
 
 # --- GET ALL ARTICLES ---
 @router.get("",status_code=status.HTTP_200_OK,response_model=List[schemas.ArticleBase])
-def get_all_articles(db: Session = Depends(get_session)):
+@limiter.limit("30/minute")
+def get_all_articles(request: Request , db: Session = Depends(get_session)):
 
     articles = db.query(models.Articles).filter(models.Articles.published == True).all()
-
-    if not articles:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"articles are not found!")
 
     return articles
 
 # --- GET AN ARTICLE BY ID ---
 @router.get("/{id}",status_code=status.HTTP_200_OK,response_model=schemas.ArticleOut)
-def get_article_by_id(id: int, db: Session = Depends(get_session)):
+@limiter.limit("60/minute")
+def get_article_by_id(request: Request, id: int, db: Session = Depends(get_session)):
 
     article = db.query(models.Articles).filter(models.Articles.id == id, models.Articles.published == True).first()
 

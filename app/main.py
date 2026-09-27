@@ -1,6 +1,7 @@
 # from fastapi.middleware.cors import CORSMiddleware
 from .routers import public, admin, articles
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Request
+from .limiter import limiter
 
 tags_metadata = [
     {
@@ -28,12 +29,13 @@ app = FastAPI(
     openapi_tags=tags_metadata
 )
 
+# === ROUTERS ===
 app.include_router(articles.router)
 app.include_router(public.router)
 app.include_router(admin.router)
 
-# === CORSMiddleware ===
 
+# === CORSMiddleware ===
 # origins = ["*"]
 # app.add_middleware(
 #     CORSMiddleware,
@@ -45,12 +47,14 @@ app.include_router(admin.router)
 
 # --- ROOT URL ---
 @app.get("/", status_code=status.HTTP_200_OK, tags=["System"])
-async def root():
+@limiter.limit("20/minute")
+async def root(request: Request):
 
     return {"message": "this is the root 'personal-blog-api' "}
 
 
 # --- CHECK HEALTH ---
 @app.get("/health", status_code=status.HTTP_200_OK, tags=["System"])
-async def health():
+@limiter.limit("20/minute")
+async def health(request: Request):
     return {"status": "ok"}
