@@ -1,8 +1,9 @@
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException, Request
 from app.database import get_session
 from sqlalchemy.orm import Session
 from ..auth import require_admin
 from app import schemas, models
+from ..limiter import limiter
 from ..auth import hash_pass
 from typing import List
 
@@ -12,7 +13,8 @@ router = APIRouter(prefix="/admin", tags=["Admin Management"], dependencies=[Dep
 
 # --- GET ME ---
 @router.get("/me", status_code=status.HTTP_200_OK,response_model=schemas.Users)
-def me(admin: models.Users = Depends(require_admin)):
+@limiter.limit("30/minute")
+def me(request: Request, admin: models.Users = Depends(require_admin)):
 
     if not admin:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"admin is not found!")
@@ -42,11 +44,9 @@ def create_admin(user: schemas.AdminCreate, db: Session = Depends(get_session)):
 
 # --- GET ALL USERS ---
 @router.get("/users", status_code=status.HTTP_200_OK,response_model=List[schemas.Users])
-def get_all_users(db: Session = Depends(get_session)):
+@limiter.limit("30/minute")
+def get_all_users(request: Request, db: Session = Depends(get_session)):
 
     users = db.query(models.Users).all()
-
-    if not users:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"users are not found!")
 
     return users

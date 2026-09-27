@@ -18,6 +18,7 @@ it through the interactive docs at `/docs`.
 - SQLModel (on top of SQLAlchemy 2.0), PostgreSQL, Alembic for migrations
 - HTTP Basic Auth with Argon2 password hashing (`argon2-cffi`)
 - Pydantic Settings for configuration
+- `slowapi` for per-IP rate limiting
 
 ## Authentication & authorization
 
@@ -34,6 +35,18 @@ it through the interactive docs at `/docs`.
   very first admin account must be inserted directly into the database with
   an Argon2-hashed password before the API can be used to create further
   admins.
+
+## Rate limiting
+
+Every route is rate-limited per client IP using `slowapi`. Exceeding a limit
+returns `429 Too Many Requests`.
+
+| Area | Limit |
+|---|---|
+| `/`, `/health` | 20/minute |
+| `GET /articles` | 30/minute |
+| `GET /articles/{id}` | 60/minute |
+| `/admin/*` (reads, article writes) | 30/minute |
 
 ## Endpoints
 
