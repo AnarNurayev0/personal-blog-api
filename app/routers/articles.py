@@ -1,6 +1,5 @@
 from fastapi import APIRouter, status, Depends, HTTPException, Request
-from app.database import get_session
-from sqlalchemy.orm import Session
+from ..database import DatabaseDep
 from ..auth import require_admin
 from app import schemas, models
 from typing import List, Union
@@ -13,7 +12,7 @@ router = APIRouter(prefix="/admin/articles", tags=["Admin Articles"], dependenci
 # --- GET ALL ARTICLES - [DETAILED] ---
 @router.get("",status_code=status.HTTP_200_OK,response_model=List[schemas.ArticleDetailed])
 @limiter.limit("30/minute")
-def get_all_articles(request: Request, db: Session = Depends(get_session)):
+def get_all_articles(request: Request, db: DatabaseDep):
 
     articles = db.query(models.Articles).all()
 
@@ -22,7 +21,7 @@ def get_all_articles(request: Request, db: Session = Depends(get_session)):
 # --- GET AN ARTICLE BY ID - [DETAILED] ---
 @router.get("/{id}",status_code=status.HTTP_200_OK,response_model=schemas.ArticleDetailed)
 @limiter.limit("30/minute")
-def get_article_by_id(request: Request, id: int, db: Session = Depends(get_session)):
+def get_article_by_id(request: Request, id: int, db: DatabaseDep):
 
     article = db.query(models.Articles).filter(models.Articles.id == id).first()
 
@@ -34,7 +33,7 @@ def get_article_by_id(request: Request, id: int, db: Session = Depends(get_sessi
 # --- CREATE AN ARTICLE ---
 @router.post("",status_code=status.HTTP_201_CREATED,response_model=Union[schemas.ArticleDetailed, List[schemas.ArticleDetailed]])
 @limiter.limit("30/minute")
-def create_article(request: Request, payload: Union[schemas.ArticleInput, List[schemas.ArticleInput]], db: Session = Depends(get_session), admin: models.Users = Depends(require_admin)):
+def create_article(request: Request, payload: Union[schemas.ArticleInput, List[schemas.ArticleInput]], db: DatabaseDep, admin: models.Users = Depends(require_admin)):
 
     if isinstance(payload, list):
         if not payload:
@@ -65,7 +64,7 @@ def create_article(request: Request, payload: Union[schemas.ArticleInput, List[s
 # --- UPDATE AN ARTICLE - [PUT] ---
 @router.put("/{id}",status_code=status.HTTP_200_OK,response_model=schemas.ArticleDetailed)
 @limiter.limit("30/minute")
-def put_article(request: Request, article: schemas.ArticleInput, id: int, db: Session = Depends(get_session)):
+def put_article(request: Request, article: schemas.ArticleInput, id: int, db: DatabaseDep):
 
     db_article = db.query(models.Articles).filter(id == models.Articles.id).first()
 
@@ -87,7 +86,7 @@ def put_article(request: Request, article: schemas.ArticleInput, id: int, db: Se
 # --- UPDATE AN ARTICLE - [PATCH] ---
 @router.patch("/{id}",status_code=status.HTTP_200_OK,response_model=schemas.ArticleDetailed)
 @limiter.limit("30/minute")
-def patch_article(request: Request, article: schemas.ArticleInputPatch, id: int, db: Session = Depends(get_session)):
+def patch_article(request: Request, article: schemas.ArticleInputPatch, id: int, db: DatabaseDep):
 
     db_article = db.query(models.Articles).filter(models.Articles.id == id).first()
 
@@ -106,7 +105,7 @@ def patch_article(request: Request, article: schemas.ArticleInputPatch, id: int,
 # --- DELETE AN ARTICLE ---
 @router.delete("/{id}",status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit("30/minute")
-def delete_article_by_id(request: Request, id: int, db: Session = Depends(get_session)):
+def delete_article_by_id(request: Request, id: int, db: DatabaseDep):
 
     if not id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=f"id is not found!")
